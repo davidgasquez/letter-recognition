@@ -3,6 +3,7 @@ library(MASS)         # LDA and QDA
 library(class)        # KNN
 library(tree)         # Tree
 library(rpart)        # Tree
+library(randomForest) # Random Forest
 
 # Load data
 letter.recognition <- read.csv("letter-recognition.data")
@@ -102,7 +103,7 @@ knn.cv.test.rate <- mean(knn.cv.pred == letter.recognition[, 1])
 
 
 ###############################################################################
-#                                   Trees                                     #
+#                                   Tree                                      #
 ###############################################################################
 
 # Fit a tree
@@ -138,6 +139,21 @@ tree2.pred <- predict(tree2.fit, letter.recognition[,], type="class")
 # Compute test rate
 tree2.test.rate <- mean(tree2.pred == letter.recognition[, 1])
 
+###############################################################################
+#                                 Bagging                                     #
+###############################################################################
+
+# Fit a bagging model
+bagging.fit <- randomForest(Letter~.,letter.recognition[train,],
+                            mtry=16,importance=TRUE)
+
+# See fit info
+bagging.fit
+
+# Make prediction and save error rate
+bagging.pred <- predict(bagging.fit,letter.recognition[-train,])
+bagging.test.rate <- mean(bagging.pred == letter.recognition[-train, 1])
+# It's almost OOB estimate error rate
 
 ###############################################################################
 #                                 Results                                     #
