@@ -4,6 +4,7 @@ library(class)        # KNN
 library(tree)         # Tree
 library(rpart)        # Tree
 library(randomForest) # Random Forest
+library(gbm)          # Boosting
 
 # Load data
 letter.recognition <- read.csv("letter-recognition.data")
@@ -139,6 +140,7 @@ tree2.pred <- predict(tree2.fit, letter.recognition[,], type="class")
 # Compute test rate
 tree2.test.rate <- mean(tree2.pred == letter.recognition[, 1])
 
+
 ###############################################################################
 #                                  Bagging                                    #
 ###############################################################################
@@ -229,6 +231,38 @@ randomForest.a.test.rate <- mean(
 
 
 ###############################################################################
+#                               Boosting                                      #
+###############################################################################
+
+# Fit model
+boosting.fit <- gbm(Letter ~ .,
+                    data=letter.recognition[train,],
+                    distribution="multinomial")
+
+# See fit summary
+boosting.fit
+summary(boosting.fit)
+
+# Make prediction into test
+boosting.pred <- predict(boosting.fit ,
+                         letter.recognition[-train,],
+                         type="response",
+                         n.trees = 100)
+
+# We have to trnasform prediction into a matrix, getting the letter
+# with highest probability
+pred.matrix <- matrix(boosting.pred,  ncol = ncol(boosting.pred))
+boosting.pred.values <- character(0)
+for(i in 1:nrow(boosting.pred)){
+  boosting.pred.values[i] <- colnames(boosting.pred)[which.max(pred.matrix[i,])]
+}
+boosting.pred.values <- as.factor(boosting.pred.values)
+
+# Assign the error rate
+boosting.test.rate <- mean(boosting.pred.values == letter.recognition[-train, 1])
+
+
+###############################################################################
 #                                 Results                                     #
 ###############################################################################
 
@@ -251,3 +285,6 @@ print(bagging.test.rate)
 
 # Random Forests
 print(randomForest.a.test.rate)
+
+# Boosting
+print(boosting.test.rate)
