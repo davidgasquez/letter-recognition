@@ -5,6 +5,7 @@ library(tree)         # Tree
 library(rpart)        # Tree
 library(randomForest) # Random Forest
 library(gbm)          # Boosting
+library(e1071)        # SVM
 
 # Load data
 letter.recognition <- read.csv("letter-recognition.data")
@@ -73,7 +74,7 @@ qda2.test.rate <- mean(qda2.test.class==Letter[-train])
 
 
 ###############################################################################
-#                                      KNN                                    #
+#                                     KNN                                     #
 ###############################################################################
 
 # Set labels
@@ -263,6 +264,40 @@ boosting.test.rate <- mean(boosting.pred.values == letter.recognition[-train, 1]
 
 
 ###############################################################################
+#                                   SVN                                       #
+###############################################################################
+
+# Fit SVM
+svm.fit <- svm(Letter~., letter.recognition[train,])
+
+# Make prediction and save test rate
+svm.pred <- predict(svm.fit, letter.recognition[-train,])
+svm.test.rate <- mean(svm.pred == letter.recognition[-train,1])
+
+# Tune SVM
+tuned.fit <- tune.svm(Letter~.,
+                      data = letter.recognition[train,],
+                      gamma = c(0.05,0.1,0.25,0.15,0.2),
+                      cost = 10^(2:4))
+
+# Same as tune.out$best.model
+svm.tuned.fit <- svm(Letter~., letter.recognition[train,],
+                     gamma = 0.1,
+                     cost = 100,
+                     cross = 10)
+svm.tuned.pred = predict(svm.tuned.fit, letter.recognition[-train,])
+svm.tuned.test.rate = mean(svm.tuned.pred == letter.recognition[-train,1])
+
+# Change kernel to see if test.rate rises
+svm.tuned.fit <- svm(Letter~., letter.recognition[train,],
+                     kernel = "polynomial",
+                     gamma = 0.1, cost = 100,
+                     cross = 10, epsilon = 2)
+svm.tuned.pred = predict(svm.tuned.fit, letter.recognition[-train,])
+svm.tuned.test.rate = mean(svm.tuned.pred == letter.recognition[-train,1])
+
+
+###############################################################################
 #                                 Results                                     #
 ###############################################################################
 
@@ -288,3 +323,6 @@ print(randomForest.a.test.rate)
 
 # Boosting
 print(boosting.test.rate)
+
+# SVM
+print(svm.tuned.test.rate)
