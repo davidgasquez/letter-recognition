@@ -46,14 +46,14 @@ subset(4.000 instances)
 
 | Technique      | Test Rate |
 |----------------|-----------|
-|            LDA |           |
-|            QDA |           |
-|            KNN |           |
-|   Tree(simple) |           |
-|        Bagging |           |
-| Random Forests |           |
-|       Boosting |           |
-|            SVM |           |
+|            LDA |  0.8955   |
+|            QDA |  0.9497   |
+|            KNN |  0.9641   |
+|   Tree(simple) |  0.4799   |
+|        Bagging |  0.9454   |
+| Random Forests |  0.9915   |
+|       Boosting |  0.5805   |
+|            SVM |  0.9487   |
 
 Source
 ------
