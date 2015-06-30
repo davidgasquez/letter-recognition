@@ -250,7 +250,7 @@ boosting.pred <- predict(boosting.fit ,
                          type="response",
                          n.trees = 100)
 
-# We have to trnasform prediction into a matrix, getting the letter
+# We have to transform prediction into a matrix, getting the letter
 # with highest probability
 pred.matrix <- matrix(boosting.pred,  ncol = ncol(boosting.pred))
 boosting.pred.values <- character(0)
